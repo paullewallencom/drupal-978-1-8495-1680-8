@@ -1,0 +1,8 @@
+name = Colorbox file
+description = Provides integration between Colorbox and file fields.
+core = 7.x
+
+files[] = colorbox_file.module
+
+dependencies[] = file_entity
+dependencies[] = colorbox

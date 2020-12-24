@@ -1,0 +1,8 @@
+name = Media Colorbox
+description = Provides integration between the Media module (file entities) and the Colorbox module.
+core = 7.x
+
+files[] = media_colorbox.module
+
+dependencies[] = file_entity
+dependencies[] = colorbox
