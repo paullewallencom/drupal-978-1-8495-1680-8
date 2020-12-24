@@ -1,0 +1,100 @@
+<?php
+/**
+ * Implements hook_field_formatter_info().
+ */
+function d7dev_field_formatter_info() {
+  return array(
+    'd7dev_integer_duration' => array(
+      'label' => t('Duration'),
+      'field types' => array('number_integer'),
+    )
+  );
+}
+
+/**
+ * Implements hook_field_info_alter().
+ */
+function d7dev_field_info_alter(&$info) {
+  $info['number_integer']['microdata'] = TRUE;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function d7dev_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $settings = $display['settings'];
+
+  switch ($display['type']) {
+    case 'd7dev_integer_duration':
+      foreach ($items as $delta => $item) {
+        //some simple math to covert the duration minutes to hours and the remainder as minutes
+        $hours = floor($item['value']/60);
+        $minutes = $item['value']%60;
+        //get greatest common denominator of minutes to convert to fraction of hours
+        $minutes_gcd = gcd($minutes, 60);
+        //&frasl; is the html entity for the fraction separator, and we use the sup and sub html element to give
+        //the appearance of a fraction
+        $minutes_fraction = '<sup>' . $minutes/$minutes_gcd . '</sup>&frasl;<sub>' . 60/$minutes_gcd . '</sub>';
+        $markup = $hours > 0 ? $hours . ' and ' . $minutes_fraction . ' hours' : $minutes_fraction . ' hours';
+        //finally, return our formatted value as the markup for this field formatter
+        $element[$delta] = array('#markup' => $markup);
+      }
+      break;
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_image_default_styles().
+ */
+function d7dev_image_default_styles() {
+  $styles = array();
+
+  $styles['small'] = array(
+    'effects' => array(
+      array(
+        'name' => 'image_scale', 
+        'data' => array(
+          'width' => 160,
+          'height' => 120,
+          'upscale' => 0,
+        ), 
+        'weight' => 0,
+      ),
+    ),
+  );
+
+  return $styles;
+}
+
+/**
+ * Implementation of hook_fivestar_widgets().
+ *
+ * This hook allows other modules to create additional custom widgets for
+ * the fivestar module.
+ *
+ * @return array
+ *   An array of key => value pairs suitable for inclusion as the #options in a
+ *   select or radios form element. Each key must be the location of a css
+ *   file for a fivestar widget. Each value should be the name of the widget.
+ */
+function d7dev_fivestar_widgets() {
+  $widgets_directory = drupal_get_path('module', 'd7dev') .'/widgets';
+  $files = file_scan_directory($widgets_directory, '/\.css$/');
+
+  $widgets = array();
+  foreach ($files as $file) {
+    if (strpos($file->filename, '-rtl.css') === FALSE) {
+      $widgets[$file->uri] = drupal_ucfirst(str_replace('-color', '', $file->name));
+    }
+  }
+  return $widgets;
+}
+
+//simple helper function to get gcd of minutes
+function gcd($a, $b) {
+    $b = ( $a == 0 )? 0 : $b;
+    return ( $a % $b )? gcd($b, abs($a - $b)) : $b;
+}

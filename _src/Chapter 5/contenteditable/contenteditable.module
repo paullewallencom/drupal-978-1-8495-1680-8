@@ -1,0 +1,197 @@
+<?php
+
+/**
+ * @file
+ * contentEditable fields module.
+ */
+
+/**
+ * Implementation of hook_menu().
+ */
+function contenteditable_menu() {
+
+  $items['contenteditable/ajax'] = array(
+    'title' => t('contenteditable AJAX'),
+    'type' => MENU_CALLBACK,
+    'page callback' => 'contenteditable_ajax',
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/**
+ * Callback for the contenteditable_menu hook
+ */
+function contenteditable_ajax() {
+  // Retrieve the slider value
+  $field_value = $_POST['field_value'];
+  $nid = (int)$_POST['nid'];
+  $field_name = $_POST['fieldname'];
+  $node = node_load($nid);
+  $node->{$field_name} = array('und'=>array(array('value'=>$field_value)));
+  node_save($node);
+  // Return json
+  $json_output = array();
+  $json_output['nid'] = $nid;
+  $json_output['fieldname'] = $field_name;
+  $json_output['msg'] = t('The field value has been updated.');
+  drupal_json_output($json_output);
+}
+
+/**
+ * Implementation of hook_field_formatter_info().
+ */
+function contenteditable_field_formatter_info() {
+  return array(
+    'contenteditable' => array(
+      'label' => t('contentEditable'),
+      'field types' => array('text','text_long','text_with_summary','list_text'),
+      'settings' => array(
+        'fallback_format' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function contenteditable_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  //This gets the view_mode where our settings are stored
+  $display = $instance['display'][$view_mode];
+  //This gets the actual settings
+  $settings = $display['settings'];  
+  $element = array();
+  
+  //had an issue when using this formatter in a View, results in a Fatal error: undefined function field_ui_formatter_options()
+  if (!function_exists(field_ui_formatter_options)) {
+    module_load_include('inc', 'field_ui', 'field_ui.admin');
+  }
+  
+  //fallback formatter
+  // Get the list of formatters for this field type, and remove our own.
+  $formatters = field_ui_formatter_options($field['type']);
+  unset($formatters['contenteditable']); 
+  $element['fallback_format'] = array(
+    '#type' => 'select',
+    '#title' => t('Fallback formatter'),
+    '#options' => $formatters,
+    '#description'    => t('The format to be used when not in edit mode.'),  //helper text
+    '#default_value' => $settings['fallback_format'],
+  );
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function contenteditable_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $formatter_type = field_info_formatter_types($settings['fallback_format']);//get label of fallback formater for summary info
+  $fallback_format = isset($formatter_type['label']) ? $formatter_type['label'] : 'Default';
+  $summary = t('Fallback format: @fallback_format format <br/>(Select formatter to be used for users that don\'t have permission to edit the field.)', array(
+    '@fallback_format' => $fallback_format,
+  )); // we use t() for translation and placeholders to guard against attacks
+  return $summary;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function contenteditable_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  // See if access to edit this field is restricted,
+  //if so, use the default formatter.
+  if (!entity_access('update', $entity_type, $entity) || !field_access('edit', $field, $entity_type, $entity)) {
+    // Can't edit.
+    return contenteditable_fallback_formatter($entity_type, $entity, $field, $instance, $langcode, $items, $display);
+  } 
+  $element = array();
+  foreach ($items as $delta => $item) {
+    $element[$delta] = array('#markup' => '<div contentEditable="true" data-tooltip="click to edit" data-nid="' . $entity->nid . '" data-fieldname="' . $field['field_name']. '">' . $item['value'] . '</div>');
+  }
+  
+  //use the #attached property to add the JavaScript and CSS
+  $path = drupal_get_path('module', 'contenteditable');
+  $element['#attached'] = array(
+      'js' => array(
+        $path . '/contenteditable.js' => array(),
+        // JavaScript settings may use the 'data' key.
+        array(
+          'type' => 'setting', 
+          'data' => array('contenteditableButtons' => _contenteditable_add_controls()),
+        ),
+      ),
+      'css' => array(
+        $path . '/contenteditable.css' => array(),
+      ),
+      //add system library, used by the successHandler method of our JavaScript
+      'library' => array(
+        array('system', 'effects.highlight'),
+      ),
+    );
+   
+  return $element;
+}
+
+/**
+ * Format a field using the fallback formatter of the contenteditable field.
+ */
+function contenteditable_fallback_formatter($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  // Set the fallback formatter.
+  $display['type'] = $display['settings']['fallback_format'];
+  $formatter_type = field_info_formatter_types($display['type']);
+  $display['module'] = $formatter_type['module'];
+
+  // Clone the entity to avoid messing with it.
+  $cloned_entity = clone $entity;
+
+  return field_view_field($entity_type, $cloned_entity, $field['field_name'], $display, $langcode);
+}
+
+/**
+ * Hook and helper function to add the controls to Drupal.settings
+ *
+ */
+function _contenteditable_add_controls() {
+  $buttons = array(
+      'bold' => array(
+        'wrapper' => '<button>',
+        'event' => 'click',
+        'attributes' => array(
+          'html' => '<strong>B</strong>',
+          'data-command' => 'bold',
+          'alt' => 'bold',
+          'data-tooltip' => t('bold'),
+        ),
+      ),
+      'italic' => array(
+        'wrapper' => '<button>',
+        'event' => 'click',
+        'attributes' => array(
+          'html' => '<i>i</i>',
+          'data-command' => 'italic',
+          'alt' => 'italic',
+          'data-tooltip' => t('italic'),
+        ),
+      ),
+      'underline' => array(
+        'wrapper' => '<button>',
+        'event' => 'click',
+        'attributes' => array(
+          'html' => '<u>u</u>',
+          'data-command' => 'underline',
+          'alt' => 'underline',
+          'data-tooltip' => t('underline selected text'),
+        ),
+      ),
+  );
+  //hook to add controls
+  $additional_controls = module_invoke_all('contenteditable_add_controls');
+  if (is_array($additional_controls)) {
+    $buttons = array_merge($buttons, $additional_controls);
+  }
+  return $buttons;
+}

@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * Implements hook_field_info()
+ */
+function nutritioninfo_field_info() {
+  $fields = array();
+
+  $fields['nutritioninfo'] = array(
+    'label' => t('Nutrition Information'),
+    'description' => t('A field type used for storing nutrition information as defined by the Microdata spec at http://schema.org/NutritionInformation.'),
+    'settings' => array(),
+    'instance_settings' => array(),
+    'default_widget' => 'nutritioninfo_standard',
+    'default_formatter' => 'nutritioninfo_default',
+  );
+
+  return $fields;
+}
+
+/**
+ * Implements hook_field_validate().
+ */
+function nutritioninfo_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+  //at this point, there is nothing to validate
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function nutritioninfo_field_is_empty($item, $field) {
+  //the nutrition field is empty if all of its properties are empty
+  return empty($item['calories']) 
+    && empty($item['carbohydrate_content'])
+    && empty($item['cholesterol_content'])
+    && empty($item['fat_content'])
+    && empty($item['fiber_content'])
+    && empty($item['protein_content'])
+    && empty($item['saturated_fat_content'])
+    && empty($item['serving_size'])
+    && empty($item['sodium_content'])
+    && empty($item['sugar_content'])
+    && empty($item['trans_fat_content'])
+    && empty($item['unsaturated_fat_content']);
+}
+
+/**
+ * Implements hook_field_widget_info()
+ */
+function nutritioninfo_field_widget_info() {
+  $widgets = array();
+
+  $widgets['nutritioninfo_standard'] = array(
+    'label' => t('Nutrition Information form'),
+    'field types' => array('nutritioninfo'),
+    'settings' => array(
+      'format_handlers' => array('nutritioninfo'),
+    ),
+  );
+
+  return $widgets;
+}
+
+/**
+ * Implements hook_field_widget_form()
+ */
+function nutritioninfo_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $settings = $form_state['field'][$instance['field_name']][$langcode]['field']['settings'];
+ 
+  $fields = array(
+    'calories' => t('Calories'),
+    'carbohydrate_content' => t('Carbohydrate Content'),
+    'cholesterol_content' => t('Cholesterol Content'),
+    'fat_content' => t('Fat Content'),
+    'fiber_content' => t('Fiber Content'),
+    'protein_content' => t('Protein Content'),
+    'saturated_fat_content' => t('Saturated Fat Content'),
+    'serving_size' => t('Serving Size'),
+    'sodium_content' => t('Sodium Content'),
+    'sugar_content' => t('Sugar Content'),
+    'trans_fat_content' => t('Trans Fat Content'),
+    'unsaturated_fat_content' => t('Unsaturated Fat Content'),
+  );
+ 
+  foreach ($fields as $key => $label) {
+    $value = isset($items[$delta][$key]) ? $items[$delta][$key] : '';
+    $element[$key] = array(
+      '#attributes' => array('class' => array('edit-nutrition-field'), 'title' => t('')),
+      '#type' => 'textfield',
+      '#size' => 3,
+      '#maxlength' => 3,
+      '#title' => $label,
+      '#default_value' => $value,
+      '#prefix' => '<div class="nutrition-field nutrition-' . $key . '-field">',
+      '#suffix' => '</div>',
+    );
+  }
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_info()
+ */
+function nutritioninfo_field_formatter_info() {
+  return array(
+    'nutritioninfo_default' => array(
+      'label' => t('Default'),
+      'field types' => array('nutritioninfo'),
+    ),
+  );
+}  
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function nutritioninfo_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+ 
+  switch ($display['type']) {
+    case 'nutritioninfo_default':
+      $headers = array(
+        t('Calories'),
+        t('Carbohydrate Content'),
+        t('Cholesterol Content'),
+        t('Fat Content'),
+        t('Fiber Content'),
+        t('Protein Content'),
+        t('Saturated Fat Content'),
+        t('Serving Size'),
+        t('Sodium Content'),
+        t('Sugar Content'),
+        t('Trans Fat Content'),
+        t('Unsaturated Fat Content'),
+      );
+ 
+      $element[0]['#markup'] = theme('table', array('header' => $headers, 'rows' => $items));
+      break;
+  }
+  return $element;
+}

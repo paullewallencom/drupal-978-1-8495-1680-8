@@ -1,0 +1,9 @@
+name = Views Semantic Tabs
+description = Provides a Views style plugin for displaying grouped fields in semantic tabs.
+core = 7.x
+package = Views
+
+files[] = views_semantic_tabs_style_plugin.inc
+
+; Module dependencies
+dependencies[] = views

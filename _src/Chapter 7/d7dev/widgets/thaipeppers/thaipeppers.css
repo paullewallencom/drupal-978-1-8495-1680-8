@@ -1,0 +1,42 @@
+/* Static View-only Star Version */
+.fivestar-thaipeppers div.fivestar-widget-static .star {
+  width: 20px;
+  height: 26px;
+  background: url(thaipepper.png) no-repeat 0 0;
+}
+
+.fivestar-thaipeppers div.fivestar-widget-static .star span.on {
+  background: url(thaipepper.png) no-repeat 0 -52px;
+}
+
+.fivestar-thaipeppers div.fivestar-widget-static .star span.off {
+  background: url(thaipepper.png) no-repeat 0 0;
+}
+
+/* Javascript Star Version */
+.fivestar-thaipeppers div.fivestar-widget .cancel,
+.fivestar-thaipeppers div.fivestar-widget .star {
+  width: 20px;
+  height: 26px;
+}
+.fivestar-thaipeppers div.fivestar-widget .cancel,
+.fivestar-thaipeppers div.fivestar-widget .cancel a {
+  background: url(delete.png) no-repeat 0 0;
+}
+
+.fivestar-thaipeppers div.fivestar-widget .cancel a:hover {
+  background: url(delete.png) no-repeat 0 -26px;
+}
+
+.fivestar-thaipeppers div.fivestar-widget .star,
+.fivestar-thaipeppers div.fivestar-widget .star a {
+  background: url(thaipepper.png) no-repeat 0 0;
+}
+
+.fivestar-thaipeppers div.fivestar-widget div.on a {
+  background-position: 0 -26px;
+}
+.fivestar-thaipeppers div.fivestar-widget div.hover a,
+.fivestar-thaipeppers div.rating div a:hover {
+  background-position: 0 -52px;
+}

@@ -1,0 +1,99 @@
+<?php
+
+/**
+ * @file
+ * Tests for d7dev.module.
+ */
+
+/**
+ * Unit test for d7dev_integer_duration formatter
+ */
+class DurationFormatterUnitTestCase extends DrupalUnitTestCase{
+
+  public static function getInfo() {
+    return array(
+      'name'  => 'Duration formatter unit test',
+      'description'  => 'Unit test the gcd function for the duration formatter.',
+      'group' => 'D7Dev'
+    );
+  }
+
+  function setUp() {
+    parent::setUp('d7dev');
+  }
+
+  /**
+   * Test number_decimal field.
+   */
+  function testNumberDurationField() {  
+    $gcdResult = gcd(40, 60);//expect this to be 20
+    //use assertEqual to check if we get the expected value
+    $this->assertEqual(20, $gcdResult, t('Greatest common denominator for 60 and 40 is @result.', array('@result' => $gcdResult)));
+  }
+
+}
+
+/**
+ * Web test for d7dev_integer_duration formatter.
+ */
+class DurationFormatterWebTestCase extends DrupalWebTestCase {
+  protected $field;
+  protected $instance;
+  protected $test_user;
+
+  public static function getInfo() {
+    return array(
+      'name'  => 'Duration formatter web test',
+      'description'  => 'Test the creation and display of number field with duration formatter.',
+      'group' => 'D7Dev'
+    );
+  }
+
+  function setUp() {
+    parent::setUp('d7dev');
+    $this->test_user = $this->drupalCreateUser(array('access content','create article content'));
+    $this->drupalLogin($this->test_user);
+  }
+
+  /**
+   * Test the d7dev_integer_duration formatter output.
+   */
+  function testNumberDurationField() {    
+    // Create a field with the d7dev_integer_duration formatter.
+    $this->field = array(
+      'field_name' => drupal_strtolower($this->randomName()),
+      'type' => 'number_integer',
+    );
+    field_create_field($this->field);
+    $this->instance = array(
+      'field_name' => $this->field['field_name'],
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'widget' => array(
+        'type' => 'number',
+      ),
+      'display' => array(
+        'default' => array(
+          'type' => 'd7dev_integer_duration',
+        ),
+      ),
+    );
+    field_create_instance($this->instance);
+
+    // Display creation form.
+    $this->drupalGet('node/add/article');
+    $langcode = LANGUAGE_NONE;
+
+    // Submit a integer value; formatted it should become '1 and 3/4'.
+    $value = '105';
+    $edit = array(
+    	'title' => $this->randomName(),
+      "{$this->field['field_name']}[$langcode][0][value]" => $value,
+    );
+    $this->verbose('$edit: ' . var_export($edit, TRUE));
+    $this->drupalPost(NULL, $edit, t('Save'));
+    
+    //the d7dev_integer_duration should convert the integer to hours and fraction of an hour
+    $this->assertRaw('1 and <sup>3</sup>&frasl;<sub>4</sub>', t('Value formatted correctly.'));
+  }
+}

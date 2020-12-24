@@ -1,0 +1,97 @@
+<?php
+
+/**
+ * Implements hook_field_schema()
+ */
+function nutritioninfo_field_schema() {
+  $columns = array(
+    'calories' => array(
+      'description' => 'The number of calories.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'carbohydrate_content' => array(
+      'description' => 'The number of grams of carbohydrates.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'cholesterol_content' => array(
+      'description' => 'The number of milligrams of cholesterol.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'fat_content' => array(
+      'description' => 'The number of grams of fat.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'fiber_content' => array(
+      'description' => 'The number of grams of fiber.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'protein_content' => array(
+      'description' => 'The number of grams of protein.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'saturated_fat_content' => array(
+      'description' => 'The number of grams of saturated fat.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'serving_size' => array(
+      'description' => 'The serving size, in terms of the number of volume or mass.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'sodium_content' => array(
+      'description' => 'The number of milligrams of sodium.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'sugar_content' => array(
+      'description' => 'The number of grams of sugar.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'trans_fat_content' => array(
+      'description' => 'The number of grams of trans fat.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+    'unsaturated_fat_content' => array(
+      'description' => 'The number of grams of unsaturated fat.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => '',
+    ),
+  );
+
+  return array(
+    'columns' => $columns,
+  );
+}

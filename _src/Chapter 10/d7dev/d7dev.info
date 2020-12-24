@@ -1,0 +1,13 @@
+name = d7dev
+description = Custom module for misc custom functionality.
+core = 7.x
+package = Custom
+
+files[] = d7dev.module
+files[] = d7dev-view-ui-tabs.tpl.php
+files[] = d7dev_style_plugin.inc
+files[] = d7dev.views.inc
+files[] = tests/d7dev.test
+
+; Module dependencies
+dependencies[] = views

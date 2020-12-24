@@ -1,0 +1,73 @@
+<?php
+
+/**
+ * @file
+ * d7dev Admin module.
+ *
+ */
+
+ /**
+* Implementation of hook_wysiwyg_editor_settings_alter().
+*/
+function d7dev_admin_wysiwyg_editor_settings_alter(&$settings, &$context) {
+  if($context['profile']->editor == 'ckeditor') {
+    $settings['forcePasteAsPlainText'] = TRUE;
+  }
+} 
+
+/**
+ * Implements hook_block_info().
+ *
+ * Define all blocks provided by the module.
+ */
+function d7dev_admin_block_info() {
+  // Define an associative array for each block, in this case just one:
+  $blocks['add_recipe_content'] = array(
+    // info: (requried) The name of the block.
+    'info' => t('Add Recipe Content'),
+    // cache: (optional) Same for every user on every page where it is visible.
+    'cache' => DRUPAL_CACHE_GLOBAL,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ *
+ * Return a rendered or renderable view of a block.
+ */
+function d7dev_admin_block_view($delta = '') {
+  //$delta: what block to render as defined in hook_block_info.
+  switch ($delta) {
+    case 'add_recipe_content':
+      // The default localized title of the block, in this case NULL
+      $block['subject'] = NULL;
+      // The content of the block's body.
+      $block['content'] = d7dev_admin_contents($delta);
+      break;
+  }
+  return $block;
+}
+
+/**
+ * Function that generates the content for d7dev_admin blocks.
+ */
+function d7dev_admin_contents($delta = '') {
+  //additional blocks may be add, so base this on the block $delta
+  switch ($delta) {
+    case 'add_recipe_content':
+      //just a simple reander array with a link
+      $add_recipe_link = array(
+        '#theme' => 'link',
+        '#text' => t('Add Recipe'),
+        '#path' => 'node/add/recipe',
+        '#options' => array(
+          'attributes' => array(),
+          //REQUIRED:
+          'html' => FALSE,
+         ),
+      );
+      return $add_recipe_link;
+  }
+}

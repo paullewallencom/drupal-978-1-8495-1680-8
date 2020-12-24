@@ -1,0 +1,78 @@
+[contenteditable]:hover {
+  outline: 1px dotted #CCC;
+}
+
+div.contenteditable-processed.contenteditableActive{
+	box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+}
+
+/*buttons css*/
+div.contenteditable_buttons{
+  display: none;
+  -webkit-appearance: none;
+  -moz-border-radius: 11px;
+  -webkit-border-radius: 11px;
+  -moz-background-clip: padding;
+  -webkit-background-clip: padding;
+  border-radius: 11px;
+  background: #DDD url(images/button.png) repeat-x;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, white), color-stop(1, #DDD));
+  background: -moz-linear-gradient(top center, white 0%, #DDD 100%);
+  border: 1px solid;
+  cursor: pointer;
+  color: #333;
+  font: bold 12px/1.2 Arial, sans-serif;
+  outline: 0;
+  overflow: visible;
+  padding: 3px 10px 4px;
+  text-shadow: white 0 1px 1px;
+  width: auto;
+  border-color: #DDD #BBB #999;
+  width:240px;
+}
+
+/*buttons for format plugin*/
+#contenteditableSave,
+#contenteditableCancel{
+  float: right;
+}
+
+#contenteditableButtons button{
+	margin: 0 2px;
+}
+
+/*override line height*/
+#contenteditableButtons a:link, a:visited{
+  line-height:0;
+}
+
+#contenteditableButtons button:hover:after{ 
+  content: attr(data-tooltip);  
+  position: absolute;
+  white-space: nowrap;
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FFFFCC), color-stop(0.9, #FFFFCC));
+  background: -moz-linear-gradient(top center, #FFFFCC 0%, #FFFFCC 90%);
+  padding: 3px 7px;
+  color: #777;
+  border-radius: 3px; -moz-border-radius: 3px; -webkit-border-radius: 3px;
+  margin-left: -30px;
+  margin-top: -30px;
+}
+
+[contenteditable="true"]:not(.contenteditableActive):hover:after{
+  	content: attr(data-tooltip); 
+	position: relative;
+	right:-100%;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #FFFFCC), color-stop(0.9, #FFFFCC));
+	background: -moz-linear-gradient(top center, #FFFFCC 0%, #FFFFCC 90%);
+	padding: 3px 7px;
+	color: #777;
+}
+
+#contenteditableSaving{
+	background-color: #FFFCE5;
+	color: #840;
+	font-weight: bold;
+	font-size: 16px;
+	border-color: #ED5;
+}

@@ -1,0 +1,19 @@
+/* Adjust the background position when using this widget with a RTL langauge. */
+.fivestar-thaipeppers div.fivestar-widget-static .star span.off,
+.fivestar-thaipeppers div.fivestar-widget-static .star,
+.fivestar-thaipeppers div.fivestar-widget .star,
+.fivestar-thaipeppers div.fivestar-widget .star a,
+.fivestar-thaipeppers div.fivestar-widget .cancel,
+.fivestar-thaipeppers div.fivestar-widget .cancel a {
+  background-position: right 0;
+}
+.fivestar-thaipeppers div.fivestar-widget-static .star span.on {
+  background-position: right -26px;
+}
+.fivestar-thaipeppers div.fivestar-widget div.on a {
+  background-position: right -26px;
+}
+.fivestar-thaipeppers div.fivestar-widget div.hover a,
+.fivestar-thaipeppers div.rating div a:hover {
+  background-position: right -52px;
+}
